@@ -2,8 +2,15 @@ const express = require("express");
 const router = express.Router();
 const Users = require("../model/user");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const auth = require("../middleware/auth");
+require("dotenv/config");
 
-router.get("/", async (req, res) => {
+const createUserToken = (userId) => {
+  return jwt.sign({ id: userId }, process.env.JWT_PWD, { expiresIn: "7d" });
+};
+
+router.get("/", auth, async (req, res) => {
   try {
     const users = await Users.find({});
     return res.send(users);
@@ -22,7 +29,7 @@ router.post("/create", async (req, res) => {
 
     const user = await Users.create(req.body);
     user.password = undefined;
-    return res.send(user);
+    return res.send({ user, token: createUserToken(user.id) });
   } catch (err) {
     return res.send({ error: "Erro ao criar usuário!" });
   }
@@ -39,7 +46,7 @@ router.post("/auth", async (req, res) => {
     if (!(await bcrypt.compare(password, user.password)))
       return res.send({ error: "Erro ao autenticar usuário!" });
     user.password = undefined;
-    return res.send(user);
+    return res.send({ user, token: createUserToken(user.id) });
   } catch (err) {
     return res.send({ error: "Erro ao autenticar usuário!" });
   }
