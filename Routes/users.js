@@ -4,10 +4,10 @@ const Users = require("../model/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
-require("dotenv/config");
+const config = require('../config/config');
 
 const createUserToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_PWD, { expiresIn: "7d" });
+  return jwt.sign({ id: userId }, config.jwt_df_passwd, { expiresIn: config.jwt_expiresIn });
 };
 
 router.get("/", auth, async (req, res) => {

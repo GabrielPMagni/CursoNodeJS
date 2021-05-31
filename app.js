@@ -2,11 +2,12 @@ const express = require("express");
 const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const config = require('./config/config');
+
 require('dotenv/config');
-const url = process.env.MONGODB_CONN_STRING;
 const options = { reconnectTries: Number.MAX_VALUE, reconnectInterval: 500, poolSize: 5, useNewUrlParser: true };
 
-mongoose.connect(url, options);
+mongoose.connect(config.bd_string, options);
 mongoose.set('useCreateIndex', true);
 
 mongoose.connection.on('connected', () => {
